@@ -22,7 +22,7 @@ If a handler raises `StopIterator()` the event will not execute the rest of the 
 To bypass checks simply use `e.append(myfunction)` instead.
 
 
-####EventManager This calss represents a list of events.
+####EventManager This class represents a list of events.
 
 ___Example usage:___
 
