@@ -29,8 +29,9 @@ ___Example usage:___
 ```python
 em = EventManager()  # Create manager object.
 em["myevent"] = Event()  # Add an empty event called "myevent".
-em.["myevent"].add_handler(myfunction)  # Add handler to an event.
-em.["myevent"]()  # Fire the event: "myevent".
+em["myevent"].add_handler(myfunction)  # Add handler to an event.
+em["myevent"]()  # Fire the event: "myevent".
+em.myevent()  # You can also use '.' instead of [""], I prefer using '.'
 ```
 
 __Other.___
