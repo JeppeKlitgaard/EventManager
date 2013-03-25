@@ -115,3 +115,9 @@ class EventManager(dict):
     def __delitem__(self, key):
         for name in self[key].names:
             self[key].remove_name(name)
+
+    def __getattr__(self, name):
+        return self[name]
+
+    def __setattr__(self, name, value):
+        self[name] = value
