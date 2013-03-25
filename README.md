@@ -34,7 +34,7 @@ em["myevent"]()  # Fire the event: "myevent".
 em.myevent()  # You can also use '.' instead of [""], I prefer using '.'
 ```
 
-__Other:___
+___Other:___
 Every `EventManager` comes with a global event hook, it fires every time it gets a request to fire an event.
 It acts like any ol' `event`, and can be found under `EventManager.got_event`
 
