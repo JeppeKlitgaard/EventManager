@@ -1,1 +1,5 @@
-from EventManager import EventManager, Event
+from EventManager import (
+    EventManager,
+    Event,
+    VERSION
+)

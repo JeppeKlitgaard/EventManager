@@ -1,3 +1,7 @@
+__all__ = ("Event", "EventManager", "VERSION")
+VERSION = (0, 1)
+
+
 class Event(list):
     """This objects represents an event.
     It simply iterates thru a list of handlers once it's fired.
