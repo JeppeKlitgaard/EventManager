@@ -1,5 +1,5 @@
 __all__ = ("Event", "EventManager", "VERSION")
-VERSION = (0, 1)
+VERSION = ("0", "1")
 
 
 class Event(list):
