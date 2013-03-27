@@ -52,7 +52,7 @@ class Event(list):
         args and kwargs."""
         if self.eventmanager:
             # Fire global event. Assuming we have an eventmanager.
-            self.eventmanager.got_event(name=self.name, *args, **kwargs)
+            self.eventmanager.got_event(self.name, *args, **kwargs)
 
         for handler in self:  # Iterate over handlers
             try:
