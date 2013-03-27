@@ -40,5 +40,6 @@ It acts like any ol' `event`, and can be found under `EventManager.got_event`
 
 Examples
 ========
-I use it in my McClientLib project. [McClientLib](https://github.com/dkkline/McClientLib)
+* I use it in my McClientLib project. [McClientLib](https://github.com/dkkline/McClientLib)
+
 Add examples here, if you use this, please add a link to your code here!
