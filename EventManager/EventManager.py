@@ -1,5 +1,5 @@
 __all__ = ("Event", "EventManager", "VERSION")
-VERSION = ("0", "1")
+VERSION = ("0", "3")
 
 
 class Event(list):
@@ -26,14 +26,10 @@ class Event(list):
     Event(*args, **kwargs) -> Same as Event.fire(*args, **kwargs)
 
     Event.eventmanager => The EventManager for event.
-
-    Event.add_name(name) -> Adds an "alias". Can also be a list of names.
-
-    Event.remove_name(name) -> Removes an "alias". Can also be a list of names.
     """
     def __init__(self, *args, **kwargs):
         super(Event, self).__init__(*args, **kwargs)
-        self._eventmanager = None
+        self.eventmanager = None
         self.names = set()
 
     def clear(self):
@@ -62,42 +58,6 @@ class Event(list):
     def __call__(self, *args, **kwargs):
         self.fire(*args, **kwargs)
 
-    def add_name(self, name):
-        if type(name) == list:
-            for x in name:
-                self.add_name(x)
-        else:
-            self.names.add(name)
-            if self.eventmanager:
-                self.eventmanager[name] = self
-                return True
-            return False
-
-    def remove_name(self, name):
-        if type(name) == list:
-            for x in name:
-                self.remove_name(x)
-        else:
-            self.names.remove(name)
-            del self.eventmanager[name]
-
-    @property
-    def eventmanager(self):
-        return self._eventmanager
-
-    @eventmanager.setter
-    def eventmanager(self, eventmanager):
-        self._eventmanager = eventmanager
-        for name in self.names:
-            self.add_name(name)
-
-    @eventmanager.deleter
-    def eventmanager(self):
-        for name in self.names:
-            if self.eventmanager[name] is self:
-                self.remove_name(name)
-        self._eventmanager = None
-
 
 class EventManager(dict):
     """Object for managing events, basicly acts like a dict."""
@@ -110,15 +70,7 @@ class EventManager(dict):
             raise TypeError("'%s<%s>' is not an Event." % (key, value))
 
         super(EventManager, self).__setitem__(key, value)
-        if key not in self[key].names:
-            self[key].add_name(key)
-
-        if self[key].eventmanager is not self:
-            self[key].eventmanager = self
-
-    def __delitem__(self, key):
-        for name in self[key].names:
-            self[key].remove_name(name)
+        self[key].eventmanager = self
 
     def __getattr__(self, name):
         return self[name]
