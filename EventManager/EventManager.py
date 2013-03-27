@@ -1,5 +1,5 @@
 __all__ = ("Event", "EventManager", "VERSION")
-VERSION = ("0", "3")
+VERSION = ("0", "4")
 
 
 class Event(list):
@@ -30,29 +30,34 @@ class Event(list):
     def __init__(self, *args, **kwargs):
         super(Event, self).__init__(*args, **kwargs)
         self.eventmanager = None
-        self.names = set()
+        self.name = None
 
     def clear(self):
+        """Clears list of handlers."""
         del self[:]
-        return True
 
     def add_handler(self, handler):
-        if not hasattr(handler, "__call__"):
+        """Adds a handler. Also checks if it is callable."""
+        if not hasattr(handler, "__call__"):  # Not callable
             raise TypeError("'%s' is not callable." % handler)
 
         self.append(handler)
 
     def remove_handler(self, handler):
+        """Removes a handler."""
         self.remove(handler)
 
     def fire(self, *args, **kwargs):
+        """Fires an event, thereby executing all it's handlers with given
+        args and kwargs."""
         if self.eventmanager:
-            self.eventmanager.got_event(self.names, *args, **kwargs)
+            # Fire global event. Assuming we have an eventmanager.
+            self.eventmanager.got_event(name=self.name, *args, **kwargs)
 
-        for handler in self:
+        for handler in self:  # Iterate over handlers
             try:
-                handler(*args, **kwargs)
-            except StopIteration:
+                handler(*args, **kwargs)  # Execute handler with given args.
+            except StopIteration:  # Stop iterating if handler raised StopIter
                 break
 
     def __call__(self, *args, **kwargs):
@@ -63,17 +68,17 @@ class EventManager(dict):
     """Object for managing events, basicly acts like a dict."""
     def __init__(self, *args, **kwargs):
         super(EventManager, self).__init__(*args, **kwargs)
-        self.got_event = Event()
+        self.got_event = Event()  # Setup out global event, this will
+        # fire every time an event is fired.
 
     def __setitem__(self, key, value):
-        if not isinstance(value, Event):
-            raise TypeError("'%s<%s>' is not an Event." % (key, value))
-
         super(EventManager, self).__setitem__(key, value)
-        self[key].eventmanager = self
+        if isinstance(value, Event):  # If it is an event:
+            self[key].name = key  # Set it's name.
+            self[key].eventmanager = self  # Set it's eventmanager
 
-    def __getattr__(self, name):
+    def __getattr__(self, name):  # So we can use '.'
         return self[name]
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name, value):  # So we can use '.'
         self[name] = value
