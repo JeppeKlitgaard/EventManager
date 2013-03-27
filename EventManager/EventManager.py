@@ -1,5 +1,5 @@
 __all__ = ("Event", "EventManager", "VERSION")
-VERSION = ("0", "5")
+VERSION = ("0", "6")
 
 
 class Event(list):
@@ -70,12 +70,14 @@ class EventManager(dict):
         super(EventManager, self).__init__(*args, **kwargs)
         self.got_event = Event()  # Setup out global event, this will
         # fire every time an event is fired.
+        self.got_event.name = "GLOBAL"
+        self.got_event.eventmanager = None  # To stop looping forever.
 
     def __setitem__(self, key, value):
-        super(EventManager, self).__setitem__(key, value)
         if isinstance(value, Event):  # If it is an event:
-            self[key].name = key  # Set it's name.
-            self[key].eventmanager = self  # Set it's eventmanager
+            value.name = key  # Set it's name.
+            value.eventmanager = self  # Set it's eventmanager
+        super(EventManager, self).__setitem__(key, value)
 
     def __getattr__(self, name):  # So we can use '.'
         return self[name]
