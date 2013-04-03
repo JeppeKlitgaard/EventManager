@@ -4,6 +4,8 @@ VERSION = ("0", "6")
 
 class Event(list):
     """This objects represents an event.
+    Can be provided with *args on init. This list should be a list of handlers.
+
     It simply iterates thru a list of handlers once it's fired.
 
     If a handler raises StopIteration,
@@ -27,8 +29,8 @@ class Event(list):
 
     Event.eventmanager => The EventManager for event.
     """
-    def __init__(self, *args, **kwargs):
-        super(Event, self).__init__(*args, **kwargs)
+    def __init__(self, *args):
+        super(Event, self).__init__(args)
         self.eventmanager = None
         self.name = None
 
@@ -38,7 +40,7 @@ class Event(list):
 
     def add_handler(self, handler):
         """Adds a handler. Also checks if it is callable."""
-        if not hasattr(handler, "__call__"):  # Not callable
+        if not callable(handler):
             raise TypeError("'%s' is not callable." % handler)
 
         self.append(handler)
@@ -65,7 +67,26 @@ class Event(list):
 
 
 class EventManager(dict):
-    """Object for managing events, basicly acts like a dict."""
+    """Object for managing events, basicly acts like a dict.
+
+    EventManager.got_event is an event that will be fired whenever another
+    event is fired, with the fired events name,
+    and the arguments it was called with.
+    Handlers to got_event should at least accept 1 arg (name).
+
+    EventManager.apply(events) -> Takes an object with methods, and applies
+    them to EventManager.
+    Example:
+        class TestEvents(object):
+            @staticmethod
+            def test_method():
+                pass
+
+        e = TestEvents()
+        em = EventManager()
+        em.apply(e)
+        # em now has an event called test_method, and e.test_method as handler
+        """
     def __init__(self, *args, **kwargs):
         super(EventManager, self).__init__(*args, **kwargs)
         self.got_event = Event()  # Setup out global event, this will
@@ -84,3 +105,17 @@ class EventManager(dict):
 
     def __setattr__(self, name, value):  # So we can use '.'
         self[name] = value
+
+    def apply(self, events):
+        for method in dir(events):
+            # Skip attributes
+            if not callable(getattr(events, method)):
+                continue
+            # Skip "trash" functions
+            if method.startswith("_"):
+                continue
+
+            if not hasattr(self, method):  # Didn't have such an event already
+                self[method] = Event()  # So we create it
+
+            self[method].add_handler(getattr(events, method))
